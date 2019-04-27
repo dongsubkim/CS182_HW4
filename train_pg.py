@@ -201,7 +201,6 @@ class Agent(object):
             # START OF YOUR CODE
             # ------------------------------------------------------------------
             sy_sampled_ac = tf.squeeze(tf.multinomial(sy_logits_na, 1), axis=1)
-            #sy_sampled_ac = tf.random.categorical(logits=sy_logits_na, num_samples=1)
             # ------------------------------------------------------------------
             # END OF YOUR CODE
             # ------------------------------------------------------------------
@@ -210,9 +209,8 @@ class Agent(object):
             # ------------------------------------------------------------------
             # START OF YOUR CODE
             # ------------------------------------------------------------------
-            sy_sampled_ac = sy_mean + tf.exp(sy_logstd) * tf.random_normal(tf.shape(sy_mean))
-            #z = tf.random.normal(tf.shape(sy_mean))
-            #sy_sampled_ac = z * tf.exp(sy_logstd) + sy_mean
+            z = tf.random.normal(tf.shape(sy_mean))
+            sy_sampled_ac = z * tf.exp(sy_logstd) + sy_mean
             # ------------------------------------------------------------------
             # END OF YOUR CODE
             # ------------------------------------------------------------------
@@ -434,8 +432,8 @@ class Agent(object):
             for path_rewards in re_n:
                 q_i = np.zeros(len(path_rewards))
                 for i in reversed(range(len(path_rewards))):
-                    q_i[i] += sum(path_rewards[i]) * gamma
-                    q_i[i] += q_i[i-len(path_rewards):]
+                    q_i[i] += q_i[i-len(path_rewards):] * gamma
+                    q_i[i] += path_rewards[i]
                 q_n.extend(q_i)
         else:
             for path_rewards in re_n:
