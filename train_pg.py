@@ -257,8 +257,8 @@ class Agent(object):
             # ------------------------------------------------------------------
             # START OF YOUR CODE
             # ------------------------------------------------------------------
-            sy_logprob_n = tf.distributions.MultivariateNormalDiag(
-                lod=sy_mean, scale_diag=tf.exp(sy_logstd)
+            sy_logprob_n = tf.contrib.distributions.MultivariateNormalDiag(
+                loc=sy_mean, scale_diag=tf.exp(sy_logstd)
             ).log_prob(sy_ac_na)
             # ------------------------------------------------------------------
             # END OF YOUR CODE
