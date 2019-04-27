@@ -438,7 +438,7 @@ class Agent(object):
                 gamma_power = np.power(np.full(path_len, gamma), np.arange(path_len))
                 for i in range(path_len):
                     q = np.dot(path_rewards[i:], gamma_power[:path_len-i])
-                    q_n.appends(q)
+                    q_n.append(q)
             """
             for path_rewards in re_n:
                 path_len = len(path_rewards)
