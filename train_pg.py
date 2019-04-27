@@ -161,7 +161,7 @@ class Agent(object):
                 n_layers=self.n_layers,
                 size=self.size
             )
-            sy_logstd = tf.get_Variable(
+            sy_logstd = tf.get_variable(
                 name='policy_forward_pass_logstd',
                 shape=[self.ac_dim], 
                 trainable=True
