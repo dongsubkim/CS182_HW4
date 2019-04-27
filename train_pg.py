@@ -527,6 +527,9 @@ class Agent(object):
         # ------------------------------------------------------------------
         # START OF YOUR CODE
         # ------------------------------------------------------------------
+        print("ob_no:", ob_no)
+        print("ac_na:", ac_na)
+        print("adv_n", adv_n)
         self.sess.run(self.update_op, feed_dict={
             self.sy_ob_no:ob_no, 
             self.sy_ac_na:ac_na,
