@@ -436,15 +436,13 @@ class Agent(object):
                 for i in reversed(range(len(path_rewards))):
                     q_i[i] += sum(path_rewards[i]) * gamma
                     q_i[i] += q_i[i-len(path_rewards):]
-                q_n.append(q_i)
-            q_n = np.array(q_n).flatten()
+                q_n.extend(q_i)
         else:
             for path_rewards in re_n:
                 r_i = 0.0
                 for i, reward in enumerate(path_rewards):
                     r_i += gamma ** i * reward
-                q_n.append(np.full(len(path_rewards), r_i))
-            q_n = np.array(q_n).flatten()
+                q_n.extend(np.full(len(path_rewards), r_i))
         # ------------------------------------------------------------------
         # END OF YOUR CODE
         # ------------------------------------------------------------------
