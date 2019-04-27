@@ -434,11 +434,12 @@ class Agent(object):
         q_n = []
         if self.reward_to_go:
             for path_rewards in re_n:
-                q_i = np.zeros(len(path_rewards))
-                for i in reversed(range(len(path_rewards))):
-                    q_i[i] += np.sum(q_i[i-len(path_rewards):]) * gamma
-                    q_i[i] += path_rewards[i]
-                q_n.extend(q_i)
+                path_len = len(path_rewards)
+                for i in range(path_len):
+                    q = 0.0
+                    for t in range(path_len - i):
+                        q += (gamma ** t) * path_rewards[i+t]
+                    q_n.extend([q])
         else:
             for path_rewards in re_n:
                 r_i = 0.0
