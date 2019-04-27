@@ -200,7 +200,8 @@ class Agent(object):
             # ------------------------------------------------------------------
             # START OF YOUR CODE
             # ------------------------------------------------------------------
-            sy_sampled_ac = tf.random.categorical(logits=sy_logits_na, num_samples=1)
+            sy_sampled_ac = tf.squeeze(tf.multinomial(sy_logits_na, 1), axis=1)
+            #sy_sampled_ac = tf.random.categorical(logits=sy_logits_na, num_samples=1)
             # ------------------------------------------------------------------
             # END OF YOUR CODE
             # ------------------------------------------------------------------
@@ -209,8 +210,9 @@ class Agent(object):
             # ------------------------------------------------------------------
             # START OF YOUR CODE
             # ------------------------------------------------------------------
-            z = tf.random.normal(tf.shape(sy_mean))
-            sy_sampled_ac = z * tf.exp(sy_logstd) + sy_mean
+            sy_sampled_ac = sy_mean + tf.exp(sy_logstd) * tf.random_normal(tf.shape(sy_mean))
+            #z = tf.random.normal(tf.shape(sy_mean))
+            #sy_sampled_ac = z * tf.exp(sy_logstd) + sy_mean
             # ------------------------------------------------------------------
             # END OF YOUR CODE
             # ------------------------------------------------------------------
