@@ -343,7 +343,9 @@ class Agent(object):
             # ------------------------------------------------------------------
             # START OF YOUR CODE
             # ------------------------------------------------------------------
-            ac = self.sess.run(self.sy_sampled_ac, feed_dict={self.sy_ob_no:ob})
+            ac = self.sess.run(self.sy_sampled_ac, 
+                            feed_dict={self.sy_ob_no:ob.reshape((-1, self.ob_dim))}
+                            )               
             # ------------------------------------------------------------------
             # END OF YOUR CODE
             # ------------------------------------------------------------------
