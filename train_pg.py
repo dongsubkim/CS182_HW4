@@ -142,7 +142,7 @@ class Agent(object):
             sy_logits_na = build_mlp(
                     input_placeholder=sy_ob_no,
                     output_size=self.ac_dim,
-                    scope='policy_forward_pass_discrete',
+                    scope='policy_forward_pass_discrete_logits',
                     n_layers=self.n_layers,
                     size=self.size
                 )
@@ -157,11 +157,15 @@ class Agent(object):
             sy_mean = build_mlp(
                 input_placeholder=sy_ob_no,
                 output_size=self.ac_dim,
-                scope='policy_forward_pass_continuous',
+                scope='policy_forward_pass_continuous_mean',
                 n_layers=self.n_layers,
                 size=self.size
             )
-            sy_logstd = tf.Variable(tf.zeros([self.ac_dim]), trainable=True)
+            sy_logstd = tf.get_Variable(
+                name='policy_forward_pass_logstd',
+                shape=[self.ac_dim], 
+                trainable=True
+            )
             # ------------------------------------------------------------------
             # END OF YOUR CODE
             # ------------------------------------------------------------------
@@ -305,7 +309,7 @@ class Agent(object):
         # ------------------------------------------------------------------
         # START OF YOUR CODE
         # ------------------------------------------------------------------
-        self.loss = tf.reduce_mean(tf.multiply(self.sy_logprob_n, self.sy_adv_n))
+        self.loss = -tf.reduce_mean(tf.multiply(self.sy_logprob_n, self.sy_adv_n))
         # ------------------------------------------------------------------
         # END OF YOUR CODE
         # ------------------------------------------------------------------
@@ -344,7 +348,7 @@ class Agent(object):
             # START OF YOUR CODE
             # ------------------------------------------------------------------
             ac = self.sess.run(self.sy_sampled_ac, 
-                            feed_dict={self.sy_ob_no:ob.reshape((-1, self.ob_dim))}
+                            feed_dict={self.sy_ob_no:ob[None]}
                             )               
             # ------------------------------------------------------------------
             # END OF YOUR CODE
