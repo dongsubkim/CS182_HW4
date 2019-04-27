@@ -141,7 +141,7 @@ class Agent(object):
             # ------------------------------------------------------------------
             sy_logits_na = build_mlp(
                     input_placeholder=sy_ob_no,
-                    output_size=[None, self.ac_dim],
+                    output_size=self.ac_dim,
                     scope='policy_forward_pass_discrete',
                     n_layers=self.n_layers,
                     size=self.size
@@ -156,7 +156,7 @@ class Agent(object):
             # ------------------------------------------------------------------
             sy_mean = build_mlp(
                 input_placeholder=sy_ob_no,
-                output_size=[None, self.ac_dim],
+                output_size=self.ac_dim,
                 scope='policy_forward_pass_continuous',
                 n_layers=self.n_layers,
                 size=self.size
@@ -248,7 +248,7 @@ class Agent(object):
             # ------------------------------------------------------------------
             # START OF YOUR CODE
             # ------------------------------------------------------------------
-            sy_logprob_n = tf.distributions.categorical(logits=sy_logits_na).log_prob(sy_ac_na)
+            sy_logprob_n = tf.distributions.Categorical(logits=sy_logits_na).log_prob(sy_ac_na)
             # ------------------------------------------------------------------
             # END OF YOUR CODE
             # ------------------------------------------------------------------
