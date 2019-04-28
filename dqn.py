@@ -178,6 +178,7 @@ class QLearner(object):
         # ----------------------------------------------------------------------
         # START OF YOUR CODE
         # ----------------------------------------------------------------------
+        """
         out = q_func(obs_t_float, self.num_actions, "q_func")
         target_out = q_func(obs_tp1_float, self.num_actions, 'target_q_func') 
         self.action = tf.argmax(out)
@@ -193,6 +194,25 @@ class QLearner(object):
         self.total_error = tf.reduce_mean(huber_loss(error))
         q_func_vars = tf.get_collection(tf.GraphKeys.GLOBAL_VARIABLES, scope='q_func')
         target_q_func_vars = tf.get_collection(tf.GraphKeys.GLOBAL_VARIABLES, scope='target_q_func')
+        """
+        q = q_func(obs_t_float, self.num_actions, "q_func")
+        self.action = tf.argmax(q, axis=1)
+        target_q = q_func(obs_tp1_float, self.num_actions, "target_q_func")
+
+        if double_q:
+            q_tp1 = q_func(obs_tp1_float, self.num_actions, "q_func", reuse=True)
+            predicted_best_action_tp1 = tf.argmax(q_tp1, axis=1)
+            target_q_a = tf.reduce_sum(target_q * tf.one_hot(predicted_best_action_tp1,
+                depth=self.num_actions), axis=1)
+        else:
+            target_q_a = tf.reduce_max(target_q, axis=1)
+        
+        q_a = tf.reduce_sum(q * tf.one_hot(self.act_t_ph, depth=self.num_actions), axis=1)
+        y = self.rew_t_ph + (1 - self.done_mask_ph) * gamma * target_q_a
+        self.total_error = 0.5 * tf.reduce_mean(huber_loss(q_a - tf.stop_gradient(y)))
+        q_func_vars = tf.get_collection(tf.GraphKeys.GLOBAL_VARIABLES, scope='q_func')
+        target_q_func_vars = tf.get_collection(tf.GraphKeys.GLOBAL_VARIABLES, scope='target_q_func')
+
         # ----------------------------------------------------------------------
         # END OF YOUR CODE
         # ----------------------------------------------------------------------
