@@ -332,6 +332,30 @@ class QLearner(object):
             # ------------------------------------------------------------------
             # START OF YOUR CODE
             # ------------------------------------------------------------------
+            """
+            obs_batch, act_batch, rew_batch, next_obs_batch, done_mask = self.replay_buffer.sample(
+                self.batch_size)
+
+            if not self.model_initialized:
+                initialize_interdependent_variables(self.session, tf.global_variables(), {
+                self.obs_t_ph: obs_batch,
+                self.obs_tp1_ph: next_obs_batch,
+                })
+                self.session.run(self.update_target_fn)
+                self.model_initialized = True
+
+            self.session.run([self.train_fn, self.total_error], feed_dict={
+                self.obs_t_ph: obs_batch,
+                self.act_t_ph: act_batch,
+                self.rew_t_ph: rew_batch,
+                self.obs_tp1_ph: next_obs_batch,
+                self.done_mask_ph: done_mask,
+                self.learning_rate: self.optimizer_spec.lr_schedule.value(self.t)
+                })
+
+            if self.num_param_updates % self.target_update_freq == 0:
+                self.session.run(self.update_target_fn)
+            """
             obs_batch, act_batch, rew_batch, next_obs_batch, done_mask = self.replay_buffer.sample(self.batch_size)
             
             if not self.model_initialized:
@@ -339,8 +363,8 @@ class QLearner(object):
                 #    self.session.run(tf.variables_initializer([var]), feed_dict={
                 #        self.obs_t_ph:obs_batch, self.obs_tp1_ph:next_obs_batch
                 #    })
-                initialize_interdependent_variables(self.session, tf.global_variables(), {
-                                                    self.obs_t_ph: obs_batch, self.obs_tp1_ph: next_obs_batch})
+                self.session.run(tf.global_variables_initializer())
+                self.session.run(self.update_target_fn)
                 self.model_initialized = True
             feed_dict={
                 self.obs_t_ph:obs_batch,
@@ -353,6 +377,7 @@ class QLearner(object):
             self.session.run(self.train_fn, feed_dict=feed_dict)      
             if (self.num_param_updates+1) % self.target_update_freq == 0:
                 self.session.run(self.update_target_fn)
+            
             # ------------------------------------------------------------------
             # END OF YOUR CODE
             # ------------------------------------------------------------------
