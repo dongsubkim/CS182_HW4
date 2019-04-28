@@ -300,7 +300,7 @@ class QLearner(object):
         random_num = random.random()
         #if not self.model_initialized or random_num < self.exploration.value(self.t):
         #    action = random.randint(0, self.num_actions - 1)
-        if not self.model_initialized or randon_num < self.exploration.value(self.t):
+        if not self.model_initialized or random_num < self.exploration.value(self.t):
             action = np.random.randint(0, self.num_actions)
         else:
             action = self.session.run(self.action, feed_dict={self.obs_t_ph:[recent_frame]})[0]
