@@ -294,7 +294,7 @@ class QLearner(object):
         # ----------------------------------------------------------------------
         # START OF YOUR CODE
         # ----------------------------------------------------------------------
-        
+        """
         self.replay_buffer_idx = self.replay_buffer.store_frame(self.last_obs)
         recent_frame = self.replay_buffer.encode_recent_observation()
         #if not self.model_initialized or self.exploration.value(self.t) > np.random.uniform(size=1)[0]:
@@ -323,7 +323,7 @@ class QLearner(object):
         self.replay_buffer.store_effect(self.replay_buffer_idx, action, reward, done)
         if done:
             self.last_obs = self.env.reset()
-        """
+        
         # ----------------------------------------------------------------------
         # END OF YOUR CODE
         # ----------------------------------------------------------------------
