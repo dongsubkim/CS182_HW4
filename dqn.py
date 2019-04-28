@@ -335,7 +335,10 @@ class QLearner(object):
             obs_batch, act_batch, rew_batch, next_obs_batch, done_mask = self.replay_buffer.sample(self.batch_size)
             
             if not self.model_initialized:
-                self.session.run(tf.global_variables_initializer())
+                for var in tf.global_variables():
+                    self.session.run(tf.variables_initializer([var]), feed_dict={
+                        self.obs_t_ph:obs_batch, self.obs_tp1_ph:next_obs_batch
+                    })
                 self.model_initialized = True
             feed_dict={
                 self.obs_t_ph:obs_batch,
