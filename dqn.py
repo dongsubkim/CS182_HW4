@@ -286,22 +286,6 @@ class QLearner(object):
             obs = self.env.reset()
         self.replay_buffer.store_effect(self.replay_buffer_idx, action, reward, done)
         self.last_obs = obs
-        """
-
-        self.replay_buffer_idx = self.replay_buffer.store_frame(self.last_obs)
-
-        random_num = random.random()
-        if not self.model_initialized or random_num < self.exploration.value(self.t):
-            action = random.randint(0, self.num_actions - 1)
-        else:
-            action = self.session.run(self.action,
-                feed_dict={self.obs_t_ph: 
-                [self.replay_buffer.encode_recent_observation()]})[0]  
-        self.last_obs, reward, done, _ = self.env.step(action)
-        self.replay_buffer.store_effect(self.replay_buffer_idx, action, reward, done)
-        if done:
-            self.last_obs = self.env.reset()
-        """
         # ----------------------------------------------------------------------
         # END OF YOUR CODE
         # ----------------------------------------------------------------------
@@ -352,10 +336,6 @@ class QLearner(object):
             obs_batch, act_batch, rew_batch, next_obs_batch, done_mask = self.replay_buffer.sample(self.batch_size)
             
             if not self.model_initialized:
-                #for var in tf.global_variables():
-                #    self.session.run(tf.variables_initializer([var]), feed_dict={
-                #        self.obs_t_ph:obs_batch, self.obs_tp1_ph:next_obs_batch
-                #    })
                 self.session.run(tf.global_variables_initializer())
                 self.session.run(self.update_target_fn)
                 self.model_initialized = True
