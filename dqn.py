@@ -296,21 +296,20 @@ class QLearner(object):
         # ----------------------------------------------------------------------
 
         self.replay_buffer_idx = self.replay_buffer.store_frame(self.last_obs)
-        recent_frame = self.replay_buffer.encode_recent_observation()
+        #recent_frame = self.replay_buffer.encode_recent_observation()
         if not self.model_initialized or self.exploration.value(self.t) > np.random.uniform(size=1)[0]:
             action = np.random.randint(0, self.num_actions-1)
+        #else:
+        #    action = self.session.run(self.action, feed_dict={self.obs_t_ph:[recent_frame]})[0]
         else:
-            action = self.session.run(self.action, feed_dict={self.obs_t_ph:[recent_frame]})[0]
-        self.last_obs, reward, done, _ = self.env.step(action)
-        self.replay_buffer.store_effect(self.replay_buffer_idx, action, reward, done)
+            action = self.session.run(self.action,
+                feed_dict={self.obs_t_ph: 
+                [self.replay_buffer.encode_recent_observation()]})[0]  # difference
+        obs, reward, done, info = self.env.step(action)
         if done:
-            self.last_obs = self.env.reset()
-        
-        #obs, reward, done, info = self.env.step(action)
-        #if done:
-        #    obs = self.env.reset()
-        #self.replay_buffer.store_effect(self.replay_buffer_idx, action, reward, done)
-        #self.last_obs = obs
+            obs = self.env.reset()
+        self.replay_buffer.store_effect(self.replay_buffer_idx, action, reward, done)
+        self.last_obs = obs
         """
         self.replay_buffer_idx = self.replay_buffer.store_frame(self.last_obs)
 
