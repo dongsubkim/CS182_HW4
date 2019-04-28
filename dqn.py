@@ -274,10 +274,10 @@ class QLearner(object):
         # ----------------------------------------------------------------------
         # START OF YOUR CODE
         # ----------------------------------------------------------------------
-        """
+        
         self.replay_buffer_idx = self.replay_buffer.store_frame(self.last_obs)
         recent_frame = self.replay_buffer.encode_recent_observation()
-        if self.model_initialized or self.exploration.value(self.t) > np.random.uniform(size=1):
+        if not self.model_initialized or self.exploration.value(self.t) > np.random.uniform(size=1):
             action = np.random.randint(0, self.num_actions-1)
         else:
             action = self.session.run(self.action, feed_dict={self.obs_t_ph:[recent_frame]})[0]
@@ -287,6 +287,7 @@ class QLearner(object):
         self.replay_buffer.store_effect(self.replay_buffer_idx, action, reward, done)
         self.last_obs = obs
         """
+
         self.replay_buffer_idx = self.replay_buffer.store_frame(self.last_obs)
 
         random_num = random.random()
@@ -300,7 +301,7 @@ class QLearner(object):
         self.replay_buffer.store_effect(self.replay_buffer_idx, action, reward, done)
         if done:
             self.last_obs = self.env.reset()
-
+        """
         # ----------------------------------------------------------------------
         # END OF YOUR CODE
         # ----------------------------------------------------------------------
@@ -348,30 +349,6 @@ class QLearner(object):
             # ------------------------------------------------------------------
             # START OF YOUR CODE
             # ------------------------------------------------------------------
-            """
-            obs_batch, act_batch, rew_batch, next_obs_batch, done_mask = self.replay_buffer.sample(
-                self.batch_size)
-
-            if not self.model_initialized:
-                initialize_interdependent_variables(self.session, tf.global_variables(), {
-                self.obs_t_ph: obs_batch,
-                self.obs_tp1_ph: next_obs_batch,
-                })
-                self.session.run(self.update_target_fn)
-                self.model_initialized = True
-
-            self.session.run([self.train_fn, self.total_error], feed_dict={
-                self.obs_t_ph: obs_batch,
-                self.act_t_ph: act_batch,
-                self.rew_t_ph: rew_batch,
-                self.obs_tp1_ph: next_obs_batch,
-                self.done_mask_ph: done_mask,
-                self.learning_rate: self.optimizer_spec.lr_schedule.value(self.t)
-                })
-
-            if self.num_param_updates % self.target_update_freq == 0:
-                self.session.run(self.update_target_fn)
-            """
             obs_batch, act_batch, rew_batch, next_obs_batch, done_mask = self.replay_buffer.sample(self.batch_size)
             
             if not self.model_initialized:
