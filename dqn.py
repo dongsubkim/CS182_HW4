@@ -178,18 +178,18 @@ class QLearner(object):
         # ----------------------------------------------------------------------
         # START OF YOUR CODE
         # ----------------------------------------------------------------------
-        """
+        
         out = q_func(obs_t_float, self.num_actions, "q_func")
         target_out = q_func(obs_tp1_float, self.num_actions, 'target_q_func') 
-        self.action = tf.argmax(out)
+        self.action = tf.argmax(out, axis=1)
         if self.double_q:
             argmax_a = tf.argmax(q_func(obs_tp1_float, self.num_actions, "q_func", True), axis=1)
-            y = tf.reduce_sum(target_out * tf.one_hot(argmax_a, self.num_actions), axis=1)
+            target_q_a = tf.reduce_sum(target_out * tf.one_hot(argmax_a, self.num_actions), axis=1)
         else:
-            y = tf.reduce_max(target_out, axis=1)
-        y = self.rew_t_ph + (1-self.done_mask_ph) * gamma * y 
+            target_q_a = tf.reduce_max(target_out, axis=1)
+        y = self.rew_t_ph + (1 - self.done_mask_ph) * gamma * target_q_a 
         error = tf.reduce_sum(out * tf.one_hot(self.act_t_ph, self.num_actions), axis=1) - tf.stop_gradient(y)
-        self.total_error = 0.5*tf.reduce_mean(huber_loss(error))
+        self.total_error = tf.reduce_mean(huber_loss(error))
         q_func_vars = tf.get_collection(tf.GraphKeys.GLOBAL_VARIABLES, scope='q_func')
         target_q_func_vars = tf.get_collection(tf.GraphKeys.GLOBAL_VARIABLES, scope='target_q_func')
         """
@@ -210,7 +210,7 @@ class QLearner(object):
         self.total_error = 0.5 * tf.reduce_mean(huber_loss(q_a - tf.stop_gradient(y)))
         q_func_vars = tf.get_collection(tf.GraphKeys.GLOBAL_VARIABLES, scope='q_func')
         target_q_func_vars = tf.get_collection(tf.GraphKeys.GLOBAL_VARIABLES, scope='target_q_func')
-        
+        """
         # ----------------------------------------------------------------------
         # END OF YOUR CODE
         # ----------------------------------------------------------------------
