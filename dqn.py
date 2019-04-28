@@ -178,7 +178,7 @@ class QLearner(object):
         # ----------------------------------------------------------------------
         # START OF YOUR CODE
         # ----------------------------------------------------------------------
-        """
+        
         out = q_func(obs_t_float, self.num_actions, "q_func")
         target_out = q_func(obs_tp1_float, self.num_actions, 'target_q_func') 
         self.action = tf.argmax(out)
@@ -212,7 +212,7 @@ class QLearner(object):
         self.total_error = 0.5 * tf.reduce_mean(huber_loss(q_a - tf.stop_gradient(y)))
         q_func_vars = tf.get_collection(tf.GraphKeys.GLOBAL_VARIABLES, scope='q_func')
         target_q_func_vars = tf.get_collection(tf.GraphKeys.GLOBAL_VARIABLES, scope='target_q_func')
-
+        """
         # ----------------------------------------------------------------------
         # END OF YOUR CODE
         # ----------------------------------------------------------------------
