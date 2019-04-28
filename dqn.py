@@ -332,7 +332,7 @@ class QLearner(object):
             # ------------------------------------------------------------------
             # START OF YOUR CODE
             # ------------------------------------------------------------------
-            """
+            
             obs_batch, act_batch, rew_batch, next_obs_batch, done_mask = self.replay_buffer.sample(
                 self.batch_size)
 
@@ -377,7 +377,7 @@ class QLearner(object):
             self.session.run(self.train_fn, feed_dict=feed_dict)      
             if (self.num_param_updates+1) % self.target_update_freq == 0:
                 self.session.run(self.update_target_fn)
-            
+            """
             # ------------------------------------------------------------------
             # END OF YOUR CODE
             # ------------------------------------------------------------------
