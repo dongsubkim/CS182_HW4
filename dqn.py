@@ -279,7 +279,7 @@ class QLearner(object):
         if self.model_initialized or self.exploration.value(self.t) > np.random.uniform(size=1):
             action = np.random.randint(0, self.num_actions-1)
         else:
-            action = self.session.run(self.action, feed_dict={self.obs_t_ph:recent_frame})[0]
+            action = self.session.run(self.action, feed_dict={self.obs_t_ph:recent_frame}[None])[0]
         obs, reward, done, info = self.env.step(action)
         if done:
             obs = self.env.reset()
