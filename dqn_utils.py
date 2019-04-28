@@ -355,25 +355,3 @@ class ReplayBuffer(object):
         self.action[idx] = action
         self.reward[idx] = reward
         self.done[idx]   = done
-def initialize_interdependent_variables(session, vars_list, feed_dict):
-    """Initialize a list of variables one at a time, which is useful if
-    initialization of some variables depends on initialization of the others.
-    """
-    vars_left = vars_list
-    while len(vars_left) > 0:
-        new_vars_left = []
-        for v in vars_left:
-            try:
-                # If using an older version of TensorFlow, uncomment the line
-                # below and comment out the line after it.
-		#session.run(tf.initialize_variables([v]), feed_dict)
-                session.run(tf.variables_initializer([v]), feed_dict)
-            except tf.errors.FailedPreconditionError:
-                new_vars_left.append(v)
-        if len(new_vars_left) >= len(vars_left):
-            # This can happend if the variables all depend on each other, or more likely if there's
-            # another variable outside of the list, that still needs to be initialized. This could be
-            # detected here, but life's finite.
-            raise Exception("Cycle in variable dependencies, or extenrnal precondition unsatisfied.")
-        else:
-            vars_left = new_vars_left

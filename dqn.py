@@ -274,7 +274,7 @@ class QLearner(object):
         # ----------------------------------------------------------------------
         # START OF YOUR CODE
         # ----------------------------------------------------------------------
-        
+        """
         self.replay_buffer_idx = self.replay_buffer.store_frame(self.last_obs)
         recent_frame = self.replay_buffer.encode_recent_observation()
         if not self.model_initialized or self.exploration.value(self.t) > np.random.uniform(size=1):
@@ -286,6 +286,22 @@ class QLearner(object):
             obs = self.env.reset()
         self.replay_buffer.store_effect(self.replay_buffer_idx, action, reward, done)
         self.last_obs = obs
+        """
+        self.replay_buffer_idx = self.replay_buffer.store_frame(self.last_obs)
+
+        random_num = random.random()
+        if not self.model_initialized or random_num < self.exploration.value(self.t):
+            action = random.randint(0, self.num_actions - 1)
+        else:
+            action = self.session.run(self.action,
+                feed_dict={self.obs_t_ph: 
+                [self.replay_buffer.encode_recent_observation()]})[0]  # difference
+
+        self.last_obs, reward, done, _ = self.env.step(action)
+        self.replay_buffer.store_effect(self.replay_buffer_idx, action, reward, done)
+        if done:
+            self.last_obs = self.env.reset()
+
         # ----------------------------------------------------------------------
         # END OF YOUR CODE
         # ----------------------------------------------------------------------
