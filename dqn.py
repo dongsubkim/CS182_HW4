@@ -178,7 +178,21 @@ class QLearner(object):
         # ----------------------------------------------------------------------
         # START OF YOUR CODE
         # ----------------------------------------------------------------------
-
+        out = q_func(obs_t_float, self.num_actions, "q_func")
+        target_out = q_func(obs_tp1_float, self.num_actions, 'target_q_func') 
+        self.action = tf.argmax(out)
+        if self.double_q:
+            argmax_a = tf.argmax(q_func(obs_tp1_float, self.num_actions, "q_func", True))
+            y = tf.reduce_sum(
+                target_out * tf.one_hot(argmax_a, self.num_actions), axis=1
+            )
+        else:
+            y = tf.reduce_max(target_out, axis=1)
+        y = self.rew_t_ph + (1-self.done_mask_ph) * gamma * y 
+        error = y - tf.reduce_sum(out * tf.one_hot(self.act_t_ph, self.num_actions), axis=1)
+        self.total_error = tf.reduce_mean(huber_loss(error))
+        q_func_vars = tf.get_collection(tf.GraphKeys.GLOBAL_VARIABLES, scope='q_func')
+        target_q_func_vars = tf.get_collection(tf.GraphKeys.GLOBAL_VARIABLES, scope='target_q_func')
         # ----------------------------------------------------------------------
         # END OF YOUR CODE
         # ----------------------------------------------------------------------
@@ -260,7 +274,17 @@ class QLearner(object):
         # ----------------------------------------------------------------------
         # START OF YOUR CODE
         # ----------------------------------------------------------------------
-
+        self.replay_buffer_idx = self.replay_buffer.store_frame(self.last_obs)
+        recent_frame = self.replay_buffer.encode_recent_observation()
+        if self.model_initialized or self.exploration.value(self.t) > np.random.uniform(size=1):
+            action = np.random.randint(0, self.num_actions-1)
+        else:
+            action = self.session.run(self.action, feed_dict={self.obs_t_ph:recent_frame})[0]
+        obs, reward, done, info = self.env.step(action)
+        if done:
+            obs = self.env.reset()
+        self.replay_buffer.store_effect(idx, action, reward, done)
+        self.last_obs = obs
         # ----------------------------------------------------------------------
         # END OF YOUR CODE
         # ----------------------------------------------------------------------
@@ -308,7 +332,22 @@ class QLearner(object):
             # ------------------------------------------------------------------
             # START OF YOUR CODE
             # ------------------------------------------------------------------
-
+            obs_batch, act_batch, rew_batch, next_obs_batch, done_mask = self.replay_buffer.sample(self.batch_size)
+            
+            if not self.model_initialized:
+                self.session.run(tf.global_variables_initializer())
+                self.model_initialized = True
+            feed_dict={
+                self.obs_t_ph:obs_batch,
+                self.act_t_ph:act_batch,
+                self.rew_t_ph:rew_batch,
+                self.obs_tp1_ph:next_obs_batch,
+                self.done_mask_ph:done_mask,
+                self.learning_rate:self.optimizer_spec.lr_schedule.value(self.t)
+            }          
+            self.session.run(self.train_fn, feed_dict=feed_dict)      
+            if (self.num_param_updates+1) % self.target_update_freq == 0:
+                self.session.run(self.update_target_fn)
             # ------------------------------------------------------------------
             # END OF YOUR CODE
             # ------------------------------------------------------------------
