@@ -291,16 +291,15 @@ class QLearner(object):
 
         random_num = random.random()
         if not self.model_initialized or random_num < self.exploration.value(self.t):
-        action = random.randint(0, self.num_actions - 1)
+            action = random.randint(0, self.num_actions - 1)
         else:
-        action = self.session.run(self.action,
-            feed_dict={self.obs_t_ph: 
-            [self.replay_buffer.encode_recent_observation()]})[0]  # difference
-
+            action = self.session.run(self.action,
+                feed_dict={self.obs_t_ph: 
+                [self.replay_buffer.encode_recent_observation()]})[0]  
         self.last_obs, reward, done, _ = self.env.step(action)
         self.replay_buffer.store_effect(self.replay_buffer_idx, action, reward, done)
         if done:
-        self.last_obs = self.env.reset()
+            self.last_obs = self.env.reset()
 
         # ----------------------------------------------------------------------
         # END OF YOUR CODE
