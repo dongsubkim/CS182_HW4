@@ -433,21 +433,16 @@ class Agent(object):
         gamma = self.gamma
         q_n = []
         if self.reward_to_go:
+            gamma_power = np.power(
+                np.full(self.max_path_length, gamma), 
+                np.arange(self.max_path_length)
+                )
             for path_rewards in re_n:
                 path_len = len(path_rewards)
-                gamma_power = np.power(np.full(path_len, gamma), np.arange(path_len))
+                gammas = gamma_power[:path_len]
                 for i in range(path_len):
-                    q = np.dot(path_rewards[i:], gamma_power[:path_len-i])
+                    q = np.dot(path_rewards[i:], gammas[:path_len-i])
                     q_n.append(q)
-            """
-            for path_rewards in re_n:
-                path_len = len(path_rewards)
-                for i in range(path_len):
-                    q = 0.0
-                    for t in range(path_len - i):
-                        q += (gamma ** t) * path_rewards[i+t]
-                    q_n.extend([q])
-            """
         else:
             for path_rewards in re_n:
                 r_i = 0.0
