@@ -433,9 +433,13 @@ class Agent(object):
         gamma = self.gamma
         q_n = []
         if self.reward_to_go:
+            max_length = 0
+            for p in re_n:
+                if max_length < len(p):
+                    max_length = len(p)
             gamma_power = np.power(
-                np.full(self.max_path_length, gamma), 
-                np.arange(self.max_path_length)
+                np.full(max_length, gamma), 
+                np.arange(max_length)
                 )
             for path_rewards in re_n:
                 path_len = len(path_rewards)
